@@ -14,6 +14,9 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+
+import devPilot.backend.security.GithubOAuth2UserService;
+
 import org.springframework.security.web.SecurityFilterChain;
 
 import lombok.RequiredArgsConstructor;
@@ -23,12 +26,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class SecurityConfig {
 
-    private final AuthenticationSuccessHandler oauth2SuccessHandler;
-    private final AuthenticationFailureHandler oauth2FailureHandler;
-    private final devPilot.backend.security.GithubOAuth2UserService gitHubOAuth2UserService;
+    private final GithubOAuth2UserService gitHubOAuth2UserService;
     
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(
+        HttpSecurity http,
+        AuthenticationSuccessHandler oauth2SuccessHandler,
+        AuthenticationFailureHandler oauth2FailureHandler
+    ) throws Exception {
         http
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())

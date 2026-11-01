@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "DevPilot Backend",
+      "request": "launch",
+      "mainClass": "devPilot.backend.BackendApplication",
+      "envFile": "${workspaceFolder}/backend/.env"
+    }
+  ]
+}
