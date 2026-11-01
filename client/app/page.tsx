@@ -1,10 +1,8 @@
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-import Image from "next/image";
+import LandingPage from "@/components/LandingPage";
+import React from "react";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <AnimatedThemeToggler />
-    </div>
-  );
-}
+const page = () => {
+  return <LandingPage />;
+};
+
+export default page;

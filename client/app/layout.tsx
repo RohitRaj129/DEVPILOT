@@ -1,23 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Roboto_Slab, Public_Sans } from "next/font/google";
+import { Geist_Mono, Poppins, Roboto } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import QueryProvider from "@/components/providers/query-provider";
 
-const publicSansHeading = Public_Sans({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-heading",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
 });
 
-const robotoSlab = Roboto_Slab({
+const roboto = Roboto({
   subsets: ["latin"],
-  variable: "--font-serif",
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: "--font-roboto",
 });
 
 const geistMono = Geist_Mono({
@@ -37,11 +33,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={cn(
         "h-full",
         "antialiased",
-        geistSans.variable,
+        roboto.variable,
+        poppins.variable,
         geistMono.variable,
-        "font-serif",
-        robotoSlab.variable,
-        publicSansHeading.variable,
+        "font-sans",
       )}
       suppressHydrationWarning
     >
