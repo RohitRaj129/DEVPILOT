@@ -1,100 +1,147 @@
 "use client";
 
-import { LogOut, RefreshCw } from "lucide-react";
-import { DashboardHeader } from "./dashboard-header";
+import { LogOut, Moon, Sun, UserRound } from "lucide-react";
+import { useTheme } from "next-themes";
 
-export type SettingsUser = {
-  githubUsername: string;
-  displayName?: string | null;
-  avatarUrl?: string | null;
-};
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { useCurrentUser, useLogout } from "@/hooks/use-auth";
+import { GithubLogoIcon } from "@phosphor-icons/react";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
-function Row({
-  title,
-  hint,
-  children,
-}: {
-  title: string;
-  hint: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-4">
-      <div className="min-w-0">
-        <p className="font-semibold text-foreground">{title}</p>
-        <p className="text-sm text-muted-foreground">{hint}</p>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-export function SettingsDashboard({
-  user,
-  onSync,
-  syncing = false,
-  onLogout,
-  loggingOut = false,
-  onToggleSidebar,
-}: {
-  user?: SettingsUser | null;
-  onSync?: () => void;
-  syncing?: boolean;
-  onLogout?: () => void;
-  loggingOut?: boolean;
-  onToggleSidebar?: () => void;
-}) {
-  const btn =
-    "inline-flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-4 py-2.5 text-sm font-bold text-foreground transition hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-rose-500 disabled:opacity-60";
+export function SettingsDashboard() {
+  const { data: user } = useCurrentUser();
+  const logout = useLogout();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   return (
-    <div className="flex min-h-svh flex-col bg-background text-foreground">
-      <DashboardHeader
-        title="Settings"
-        subtitle="Account and GitHub connection"
-        onToggleSidebar={onToggleSidebar}
-      />
-
-      <main className="max-w-2xl space-y-6 p-8">
-        <section className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
-          {user?.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={user.avatarUrl} alt="" className="size-14 rounded-full" />
-          ) : (
-            <span className="flex size-14 items-center justify-center rounded-full bg-muted text-lg font-extrabold">
-              {user?.githubUsername?.[0]?.toUpperCase() ?? "?"}
-            </span>
-          )}
-          <div className="min-w-0">
-            <p className="truncate text-lg font-extrabold">
-              {user?.displayName || user?.githubUsername}
-            </p>
-            <p className="truncate text-sm text-muted-foreground">
-              @{user?.githubUsername}
-            </p>
-          </div>
-        </section>
-
-        <section className="divide-y divide-dashed divide-border rounded-2xl border border-border bg-card">
-          <Row
-            title="Sync repositories"
-            hint="Pull the latest repository list from GitHub."
-          >
-            <button onClick={onSync} disabled={syncing} className={btn}>
-              <RefreshCw
-                className={`size-4 ${syncing ? "animate-spin" : ""}`}
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 p-4 md:p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile</CardTitle>
+          <CardDescription>
+            Your GitHub account connected to DevPilot.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="size-14 rounded-xl">
+              <AvatarImage
+                src={user?.avatarUrl ?? undefined}
+                alt={user?.displayName}
               />
-              Sync
-            </button>
-          </Row>
-          <Row title="Sign out" hint="Ends your session on this device.">
-            <button onClick={onLogout} disabled={loggingOut} className={btn}>
-              <LogOut className="size-4" />
-              Sign out
-            </button>
-          </Row>
-        </section>
-      </main>
+              <AvatarFallback className="rounded-xl">
+                {(user?.displayName ?? "DP").slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate font-medium">{user?.displayName}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                @{user?.githubUsername}
+              </p>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="grid gap-3 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">Display name</span>
+              <span className="font-medium">{user?.displayName ?? "—"}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">GitHub username</span>
+              <span className="font-medium">
+                @{user?.githubUsername ?? "—"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">Authentication</span>
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <GithubLogoIcon className="size-4" />
+                GitHub OAuth
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Appearance</CardTitle>
+          <CardDescription>
+            Customize how DevPilot looks on your device.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-1">
+              <Label htmlFor="dark-mode">Dark mode</Label>
+              <p className="text-sm text-muted-foreground">
+                Switch between light and dark themes.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Sun className="size-4 text-muted-foreground" />
+              <Switch
+                id="dark-mode"
+                checked={isDark}
+                onCheckedChange={(checked) =>
+                  setTheme(checked ? "dark" : "light")
+                }
+              />
+              <Moon className="size-4 text-muted-foreground" />
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-1">
+              <Label>Theme selector</Label>
+              <p className="text-sm text-muted-foreground">
+                Current theme: {theme ?? "system"}
+              </p>
+            </div>
+            <AnimatedThemeToggler />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Account actions</CardTitle>
+          <CardDescription>
+            Manage your session and connected workspace.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3 sm:flex-row">
+          <Button variant="outline" className="justify-start" disabled>
+            <UserRound data-icon="inline-start" />
+            Manage on GitHub
+          </Button>
+          <Button
+            variant="destructive"
+            className="justify-start"
+            onClick={() => logout.mutate()}
+            disabled={logout.isPending}
+          >
+            <LogOut data-icon="inline-start" />
+            Log out
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -1,58 +1,74 @@
-"use client";
+import type { IndexStatus, Repository } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
-export type IndexStatus = "PENDING" | "INDEXING" | "READY" | "FAILED";
-
-const CONFIG: Record<IndexStatus, { label: string; className: string }> = {
-  READY: {
-    label: "Ready",
-    className: "bg-rose-600 text-white border-transparent",
-  },
-  INDEXING: {
-    label: "Indexing",
-    className:
-      "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30",
-  },
-  FAILED: {
-    label: "Failed",
-    className: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30",
-  },
-  PENDING: {
-    label: "Not indexed",
-    className: "bg-transparent text-foreground/80 border-border",
-  },
-};
-
-export function statusLabel(status: IndexStatus) {
-  return CONFIG[status].label;
+export function indexStatusLabel(status: IndexStatus) {
+  switch (status) {
+    case "READY":
+      return "Ready";
+    case "INDEXING":
+      return "Indexing";
+    case "FAILED":
+      return "Failed";
+    default:
+      return "Not indexed";
+  }
 }
 
-export function RepoStatus({
+export function IndexStatusBadge({
   status,
-  filesProcessed = 0,
-  filesTotal = 0,
+  className,
 }: {
   status: IndexStatus;
-  filesProcessed?: number;
-  filesTotal?: number;
+  className?: string;
 }) {
-  const { label, className } = CONFIG[status];
-  const pct =
-    filesTotal > 0 ? Math.round((filesProcessed / filesTotal) * 100) : 0;
+  const variant =
+    status === "READY"
+      ? "default"
+      : status === "FAILED"
+        ? "destructive"
+        : status === "INDEXING"
+          ? "secondary"
+          : "outline";
 
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${className}`}
-    >
+    <Badge variant={variant} className={cn(className)}>
       {status === "INDEXING" && (
-        <span
-          className="size-1.5 animate-pulse rounded-full bg-amber-500"
-          aria-hidden
-        />
+        <span className="mr-1 size-1.5 animate-pulse rounded-full bg-current" />
       )}
-      {label}
-      {status === "INDEXING" && filesTotal > 0 && (
-        <span className="tabular-nums">{pct}%</span>
+      {indexStatusLabel(status)}
+    </Badge>
+  );
+}
+
+export function languageColor(language: string | null) {
+  const map: Record<string, string> = {
+    TypeScript: "bg-sky-500",
+    JavaScript: "bg-amber-400",
+    Java: "bg-orange-500",
+    Python: "bg-emerald-500",
+    Go: "bg-cyan-500",
+    Rust: "bg-orange-700",
+    Kotlin: "bg-violet-500",
+  };
+  return map[language ?? ""] ?? "bg-muted-foreground";
+}
+
+export function RepoMeta({ repo }: { repo: Repository }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+      {repo.language && (
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            className={cn("size-2 rounded-full", languageColor(repo.language))}
+          />
+          {repo.language}
+        </span>
       )}
-    </span>
+      <span>{repo.defaultBranch}</span>
+      {repo.chunkCount > 0 && (
+        <span>{repo.chunkCount.toLocaleString()} chunks</span>
+      )}
+    </div>
   );
 }

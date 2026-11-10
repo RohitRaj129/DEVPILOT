@@ -11,9 +11,9 @@ export const queryKeys = {
   },
   chat: {
     all: ["chat"] as const,
-    session: (repositoryId: string) =>
-      [...queryKeys.chat.all, "session", repositoryId] as const,
-    messages: (repositoryId: string) =>
-      [...queryKeys.chat.all, "messages", repositoryId] as const,
+    sessions: (repositoryId: string) =>
+      [...queryKeys.chat.all, "sessions", repositoryId] as const,
+    messages: (sessionId: string) =>
+      [...queryKeys.chat.all, "messages", sessionId] as const,
   },
 };
